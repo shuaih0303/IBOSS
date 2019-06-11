@@ -11,3 +11,4 @@ Description: One paragraph description of what the package
 License: GPL (>= 3)
 Imports: Rcpp (>= 0.12.18)
 LinkingTo: Rcpp
+RoxygenNote: 6.1.1

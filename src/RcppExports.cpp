@@ -5,19 +5,23 @@
 
 using namespace Rcpp;
 
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP _IBOSS_rcpp_hello_world() {
+// get_iboss
+//' Get IBOSS subsample from one dimension  //'  //' @param x A data frame or data.table //' @param f para2 //' @param rr para3 //' @param max para4 NumericVector get_iboss(NumericVector x, Rcpp::NumericVector f, Rcpp::NumericVector rr, Rcpp::NumericVector max);
+RcppExport SEXP _IBOSS_get_iboss(SEXP xSEXP, SEXP fSEXP, SEXP rrSEXP, SEXP maxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello_world());
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type f(fSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type rr(rrSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type max(maxSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_iboss(x, f, rr, max));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_IBOSS_rcpp_hello_world", (DL_FUNC) &_IBOSS_rcpp_hello_world, 0},
+    {"_IBOSS_get_iboss", (DL_FUNC) &_IBOSS_get_iboss, 4},
     {NULL, NULL, 0}
 };
 
