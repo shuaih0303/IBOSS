@@ -5,23 +5,23 @@
 
 using namespace Rcpp;
 
-// get_iboss
-//' Get IBOSS subsample from one dimension  //'  //' @param x A data frame or data.table //' @param f para2 //' @param rr para3 //' @param max para4 NumericVector get_iboss(NumericVector x, Rcpp::NumericVector f, Rcpp::NumericVector rr, Rcpp::NumericVector max);
-RcppExport SEXP _IBOSS_get_iboss(SEXP xSEXP, SEXP fSEXP, SEXP rrSEXP, SEXP maxSEXP) {
+// getIdx
+NumericVector getIdx(NumericVector x, NumericVector f, NumericVector rr, NumericVector max);
+RcppExport SEXP _IBOSS_getIdx(SEXP xSEXP, SEXP fSEXP, SEXP rrSEXP, SEXP maxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type f(fSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type rr(rrSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type max(maxSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_iboss(x, f, rr, max));
+    Rcpp::traits::input_parameter< NumericVector >::type f(fSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type rr(rrSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type max(maxSEXP);
+    rcpp_result_gen = Rcpp::wrap(getIdx(x, f, rr, max));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_IBOSS_get_iboss", (DL_FUNC) &_IBOSS_get_iboss, 4},
+    {"_IBOSS_getIdx", (DL_FUNC) &_IBOSS_getIdx, 4},
     {NULL, NULL, 0}
 };
 
