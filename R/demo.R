@@ -33,7 +33,7 @@ demoIboss <- function(n=NULL, k=NULL){
     
 }
 
-demoFigures <- function(figNum=NULL){
+demoFigures <- function(figNum=NULL, p=NULL, rep=NULL){
   figs <- c("Comparisons of three subsampling methods in terms of MSEs\n with fixed subsample size 1000\n and ranging size of full data\n n=5000, 10^4, 10^5, 10^6\n",
             "Comparisons of three subsampling methods in terms of MSEs\n with fixed size of full data 10^6\n and ranging size of subsample size\n k = 200, 400, 500, 1000, 2000, 3000, 5000\n",
             "Comparisons of IBOSS and Full Data in terms of statistical inference\nPlots of coverage probabilities and average length of 95% confidence intervals\n against ranging size of full data\nn=5000, 10^4, 10^5, 10^6\nfixed subsample size k = 1000\n",
@@ -44,36 +44,135 @@ demoFigures <- function(figNum=NULL){
   }
   
   cat("CASE SELECTED", figNum, "\n") 
-  p <- 50
+  if (is.null(p)){
+    p <- 50
+  }
+  
+  
+  if (is.null(rep)){
+    rep = 1000
+  }
   
   switch(figNum, {
-    # figure 1, comparisons of intercept and slopes
+    # figure 1&2, comparisons of intercept and slopes
     N <- c(5000, 10^4, 10^5, 10^6)
     k <- 1000
-    case <- 1:6
+    case <- 1:5
     p <- 50
     
     for (i in case) {
-      mse0_all <- mse0_srs <- mse0_lev <- mse0_iboss <- matrix(0,nrow = max(case), ncol = length(N))
-      mse1_all <- mse1_srs <- mse1_lev <- mse1_iboss <- matrix(0,nrow = max(case), ncol = length(N))
+      # mse matrices: each row is a case, each col is different N
+      mse0 <- mse1 <- matrix(0, nrow = 4, ncol = length(N))
       for (Ni in 1:length(N)) {
-        tmp <- getMSE(i, N[Ni], k, p, compare = T)
-        mse0_all[i,Ni] <- tmp$mse0_all
-        mse0_srs[i,Ni] <- tmp$mse0_srs
-        mse0_lev[i,Ni] <- tmp$mse0_lev
-        mse0_iboss[i,Ni] <- tmp$mse0_iboss
-        mse1_all[i,Ni] <- tmp$mse0_all
-        mse1_srs[i,Ni] <- tmp$mse0_srs
-        mse1_lev[i,Ni] <- tmp$mse0_lev
-        mse1_iboss[i,Ni] <- tmp$mse0_iboss
+        tmp <- getMSE(i, N[Ni], k, p, rep = rep, compare = T)
+        mse0[1,Ni] <- tmp$mse0_all
+        mse0[2,Ni] <- tmp$mse0_srs
+        mse0[3,Ni] <- tmp$mse0_lev
+        mse0[4,Ni] <- tmp$mse0_iboss
+        mse1[1,Ni] <- tmp$mse1_all
+        mse1[2,Ni] <- tmp$mse1_srs
+        mse1[3,Ni] <- tmp$mse1_lev
+        mse1[4,Ni] <- tmp$mse1_iboss
       }
+      
+    mse1 <- data.frame(mses = c(log10(mse1)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(N)), logN = rep(log10(N), each = length(N)))
+    mse0 <- data.frame(mses = c(log10(mse0)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(N)), logN = rep(log10(N),each = length(N))) 
+      
+    
+    mse1_plot <- ggplot2::ggplot(data=mse1, ggplot2::aes(x=logN, y = mses, colour=factor(mse1$methods), shape=factor(mse1$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse1$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(log10(N)), max(log10(N)))) + ggplot2::xlab("log10(N)") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'),axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Slopes")
+
+    mse0_plot <- ggplot2::ggplot(data=mse0, ggplot2::aes(x=logN, y = mses, colour=factor(mse0$methods), shape=factor(mse0$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse0$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(log10(N)), max(log10(N)))) + ggplot2::xlab("log10(N)") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'), axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Intercepts")
+    
+    plot(mse1_plot)
+    plot(mse0_plot)
+    out <- list(slope_plot=mse1_plot, inter_plot=mse0_plot)
+    rm(mse1_plot)
+    rm(mse0_plot)
+    }
+  }, 
+  # figure 3, mse of beta1 vs changing k
+  {
+    N = 10^6
+    case <- 1:6
+    kk <- c(200, 400, 500, 1000, 2000, 3000, 5000)
+    for (i in case) {
+      # mse matrices: each row is a case, each col is different N
+      mse0 <- mse1 <- matrix(0, nrow = 4, ncol = length(kk))
+      for (Ki in 1:length(kk)) {
+        tmp <- getMSE(i, N, Ki, p, rep = rep, compare = T)
+        mse0[1,Ki] <- tmp$mse0_all
+        mse0[2,Ki] <- tmp$mse0_srs
+        mse0[3,Ki] <- tmp$mse0_lev
+        mse0[4,Ki] <- tmp$mse0_iboss
+        mse1[1,Ki] <- tmp$mse1_all
+        mse1[2,Ki] <- tmp$mse1_srs
+        mse1[3,Ki] <- tmp$mse1_lev
+        mse1[4,Ki] <- tmp$mse1_iboss
+      }
+      
+      mse1 <- data.frame(mses = c(log10(mse1)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(kk)), logN = rep(kk, each = length(kk)))
+      mse0 <- data.frame(mses = c(log10(mse0)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(kk)), logN = rep(kk,each = length(kk))) 
+      
+      
+      mse1_plot <- ggplot2::ggplot(data=mse1, ggplot2::aes(x=logN, y = mses, colour=factor(mse1$methods), shape=factor(mse1$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse1$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(kk), max(kk))) + ggplot2::xlab("Subsample Size (K)") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'),axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Slopes")
+      
+      mse0_plot <- ggplot2::ggplot(data=mse0, ggplot2::aes(x=logN, y = mses, colour=factor(mse0$methods), shape=factor(mse0$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse0$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(kk), max(kk))) + ggplot2::xlab("Subsample Size (K)") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'), axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Intercepts")
+      
+      plot(mse1_plot)
+      plot(mse0_plot)
+      out <- list(slope_plot=mse1_plot, inter_plot=mse0_plot)
+      rm(mse1_plot)
+      rm(mse0_plot)
+    }
+  },
+  {
+    # coverage probability 
+    # limited to case 1 & 4
+    N <- c(5000, 10^4, 10^5, 10^6)
+    k <- 1000
+    ##################
+    # finished in the future
+    ##################
+  },
+  {
+    # computing time in table 2
+    
+    
+    # left half of table 2
+    N <- c(5000, 50000, 500000)
+    p <- 500
+    k <- 1000
+    cpu_time_1 <- matrix(0, nrow = length(N), ncol = 4)
+    case <- 1
+    for (i in 1:length(N)){
+      tmp <- getMSE(case, N[i], k, p, rep = 2, compare = T)
+      cpu_time_1[i,4] <- tmp$avg_cpu_time_simulation
+      cpu_time_1[i,1] <- tmp$avg_cpu_time_iboss
+      cpu_time_1[i,2] <- tmp$avg_cpu_time_srs
+      cpu_time_1[i,3] <- tmp$avg_cpu_time_lev
+    }
+    rm(tmp)
+    colnames(cpu_time_1) <- c(5000, 50000, 500000)
+    rownames(cpu_time_1) <- c("D-OPT", "UNI", "LEV", "FULL")
+    
+    # right half of table 2
+    N <- 500000
+    p <- c(10, 100, 500)
+    k <- 1000
+    cpu_time_2 <- matrix(0, nrow = length(p), ncol = 4)
+    for (i in 1:length(p)){
+      tmp <- getMSE(case, N, k, p[i], rep = 2, compare = T)
+      cpu_time_2[i, 4] <- tmp$avg_cpu_time_simulation
+      cpu_time_2[i, 1] <- tmp$avg_cpu_time_iboss
+      cpu_time_2[i, 2] <- tmp$avg_cpu_time_srs
+      cpu_time_2[i, 3] <- tmp$avg_cpu_time_lev
     }
     
-    mse0_plot <- ggplot2::ggplot()
-    mse1_plot <- ggplot2::ggplot()
+    colnames(cpu_time_2) <- c(10, 100, 500)
+    rownames(cpu_time_2) <- c("D-OPT", "UNI", "LEV", "FULL")
+    
+    out <- list(ntable=cpu_time_1, ptable=cpu_time_2)
   })
-  
-  
   
   return(out)
   
