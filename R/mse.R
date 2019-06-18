@@ -8,7 +8,7 @@
 #' number of predictors: dim(beta) - 1
 #' @param re integer, time of repetitions
 #' @export
-get_mse <- function(case, n, k, p, re = 1000, compare = F){
+getMSE <- function(case, n, k, p, re = 1000, compare = F){
   # caseData has to be a list consists of 
   # design matrix: X(intercept included)
   # response vector: Y 
