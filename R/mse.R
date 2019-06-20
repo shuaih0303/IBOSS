@@ -6,9 +6,9 @@
 #' total number of obs(possible) : N
 #' case number: case
 #' number of predictors: dim(beta) - 1
-#' @param re integer, time of repetitions
+#' @param rept integer, time of repetitions
 #' @export
-getMSE <- function(case, n, k, p, rep = 1000, compare = F){
+getMSE <- function(case, n, k, p, rept = NULL, compare = F){
   # caseData has to be a list consists of 
   # design matrix: X(intercept included)
   # response vector: Y 
@@ -16,12 +16,14 @@ getMSE <- function(case, n, k, p, rep = 1000, compare = F){
   # total number of obs(possible) : N
   # case number: case
   # number of predictors: dim(beta) - 1
-
+  if (is.null(rept)) {rept = 100}
+  cat("Working on...case =", case, "n =", n, "k =",k, "p =", p, "rept =", rept, "compare=", compare, "...")
   if(compare){
   
-  mse_all <- mse_iboss <- mse_srs <- mse_lev <- matrix(0, ncol=2, nrow=rep) # first col is mse0, second col is mse1
-  cpu_time_iboss <- cpu_time_srs <- cpu_time_lev <- cpu_time_all <- matrix(0, ncol=2, nrow=rep) # first col is sampling time, second col is fitting time.
-  for(i in 1:rep){
+  mse_all <- mse_iboss <- mse_srs <- mse_lev <- matrix(0, ncol=2, nrow=rept) # first col is mse0, second col is mse1
+  cpu_time_iboss <- cpu_time_srs <- cpu_time_lev <- cpu_time_all <- matrix(0, ncol=2, nrow=rept) # first col is sampling time, second col is fitting time.
+  for(i in 1:rept){
+    cat("rept =" , i, "...")
     caseData <- Generate_Case_Full_Data(case, n, p)
     iboss_data <- getIBOSS(caseData, k)
     srs_data <- getSRS(caseData, k)
@@ -46,10 +48,10 @@ getMSE <- function(case, n, k, p, rep = 1000, compare = F){
               avg_cpu_time_simulation=mean(cpu_time_all[,1])
               )
   }else{
-    
-    mse_iboss <- matrix(0, ncol=2, nrow=rep) # first col is mse0, second col is mse1
-    cpu_time_iboss <- cpu_time_all <- matrix(0, ncol=2, nrow=rep) # first col is sampling time, second col is fitting time.
-    for(i in 1:rep){
+    mse_iboss <- mse_all <- matrix(0, ncol=2, nrow=rept) # first col is mse0, second col is mse1
+    cpu_time_iboss <- cpu_time_all <- matrix(0, ncol=2, nrow=rept) # first col is sampling time, second col is fitting time.
+    for(i in 1:rept){
+      cat("rept =" , i, "...")
       caseData <- Generate_Case_Full_Data(case, n, p)
       iboss_data <- getIBOSS(caseData, k)
       mse_all[i,] <- caseData$mse
@@ -63,6 +65,8 @@ getMSE <- function(case, n, k, p, rep = 1000, compare = F){
                 avg_cpu_time_iboss = mean(cpu_time_iboss[,1]),
                 avg_cpu_time_simulation=mean(cpu_time_all[,1]))
   }
+  
+  cat('done\n')
   
   return(out)
 }

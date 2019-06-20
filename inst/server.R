@@ -17,6 +17,33 @@ shinyServer(function(input, output) {
   x <- reactiveValues(out=list())
   
   
+#  observeEvent(input$case,{
+#    x$out$sim <- demoFigures(figNum = input$case)
+#    output$caseplot <- x$out$sim$
+#  })
+  
+  
+  # Simulation Page, run simulations
+  
+  observeEvent(input$run_sim_example,{
+    withProgress(message="Initializing...", value = 0, {
+      incProgress(0.1, message = "Simulation in Progress...")
+    x$out$sim_output <- demoIboss(as.numeric(input$sim_case),as.numeric(strsplit(input$sim_n,split = ',')[[1]]), as.numeric(strsplit(input$sim_k,split = ',')[[1]]), as.numeric(strsplit(input$sim_p,split = ',')[[1]]), as.numeric(input$sim_rept), as.logical(input$sim_compare))
+      incProgress(0.7, message = "Finishing simulations...")
+      incProgress(0.8, message = "Rendering output...")
+    
+    output$sim_mse0 <- renderTable(x$out$sim_output$mse0)
+    output$sim_mse1 <- renderTable(x$out$sim_output$mse1)
+    output$sim_cpu_time <- renderTable(x$out$sim_output$cpu_time)
+    output$sim_plot_mse0 <- renderPlot(plot(x$out$sim_output$mse0_plot))
+    output$sim_plot_mse1 <- renderPlot(plot(x$out$sim_output$mse1_plot))
+      incProgress(0.9, message = "Printing output into console...") 
+      print(x$out$sim_output)
+      incProgress(1, message = "Done!")
+    })
+  })
+  
+  
   #### Application page, uploading running iboss and etc
   observeEvent(req(input$file1),{ 
   

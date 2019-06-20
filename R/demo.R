@@ -1,7 +1,8 @@
-#' Wrapper function to demonstrate examples in paper
+#' Customized Simulation Functions, returns MSE and plots
 #' 
 #' @export
-demoIboss <- function(n=NULL, k=NULL){
+demoIboss <- function(case=NULL, n=NULL, k=NULL, p=NULL, rept=NULL, compare=F){
+  if(is.null(case)){
   cat("Please select an example to demonstate, or enter 0 to exit:\n")
   cases <- c("Sample Size: 5000, 10^4, 10^5, 10^6\nDistribution: multivariate normal\nSubsample Size: \n",
              "Sample Size: 5000, 10^4, 10^5, 10^6\nDistribution: multivariate lognormal\nSubsample Size: \n",
@@ -12,26 +13,151 @@ demoIboss <- function(n=NULL, k=NULL){
              "Chemical Sensor Data\n"
   )
   case <- menu(cases)
-  if (is.null(n) | is.null(k)){
-             n <- c(5000, 10^4, 10^5, 10^6)
-             k <- 1000
-             p <- 50
   }
+  if (is.null(n)){ n <- c(5000, 10^4, 10^5, 10^6) }
+  if (is.null(k)){ k <- c(1000)}
+  if (is.null(p)){ p <- c(50)} 
+  if (is.null(rep)){ rept = c(100)}
+  submethods <- c("FULL", "UNI", "LEV", "D-OPT")
+  
+  # if compare is desired, output a matrix of k and n with mses ----
+  if (compare){
+  # if k is a vector and n is a scalar ----
+    # mse matrix: colnames=k, rownames = methods
+  if(length(k) > 1 & length(n) == 1){
+    cat("k is a vector, n is a scalar, comparison is desired\n")
+  mse0 <- mse1 <- cpu_times <- matrix(0, ncol= length(k), nrow = length(submethods))
+  colnames(mse0) <- colnames(mse1) <- colnames(cpu_times) <-paste0("k=",k)
+  rownames(mse0) <- rownames(mse1) <- rownames(cpu_times) <- submethods
+  
+    for (j in 1:length(k)){
+      tmp <- getMSE(case, n, k[j], p, rept = rept, compare=compare)
+      # full data method, first row ----
+      mse0[1,j] <- tmp$mse0_all
+      mse1[1,j] <- tmp$mse1_all
+      cpu_times[1,j] <- tmp$avg_cpu_time_simulation
+      
+      # UNI method, second row ----
+      mse0[2,j] <- tmp$mse0_srs
+      mse1[2,j] <- tmp$mse1_srs
+      cpu_times[2,j] <- tmp$avg_cpu_time_srs
+      
+      # LEVERAGE method, third row ----
+      mse0[3,j] <- tmp$mse0_lev
+      mse1[3,j] <- tmp$mse1_lev
+      cpu_times[3,j] <- tmp$avg_cpu_time_lev
+      
+      # IOBSS method, forth row ----
+      mse0[4,j] <- tmp$mse0_iboss
+      mse1[4,j] <- tmp$mse1_iboss
+      cpu_times[4,j] <- tmp$avg_cpu_time_iboss
+    }
+  
+  out <- list(mse0=mse0, mse1=mse1, cpu_time=cpu_times)
+  
+  # reshape mse0 and mse1 for plot ----
+  mse1 <- data.frame(mses = c(log10(mse1)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(k)), logN = rep(k, each = length(k)))
+  mse0 <- data.frame(mses = c(log10(mse0)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(k)), logN = rep(k, each = length(k))) 
   
   
-  cat("Initializing...\n")
+  mse1_plot <- ggplot2::ggplot(data=mse1, ggplot2::aes(x=logN, y = mses, colour=factor(mse1$methods), shape=factor(mse1$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse1$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(k), max(k))) + ggplot2::xlab("Subsample Size") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'),axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Slopes")
   
-  mse0_mat <- mse1_mat <- matrix(0, ncol= length(k), nrow = length(n))
-  colnames(mse_mat) <- paste0("k=",k)
-  rownames(mse_mat) <- paste0("n=",n)
-  for (ni in n){
-    for (ki in k){
-      tmp <- getMSE(case, ni, ki, p, compare=TRUE)
+  mse0_plot <- ggplot2::ggplot(data=mse0, ggplot2::aes(x=logN, y = mses, colour=factor(mse0$methods), shape=factor(mse0$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse0$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(k), max(k))) + ggplot2::xlab("Subsample Size") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'), axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Intercepts")
+  
+  out$mse0_plot <- mse0_plot
+  out$mse1_plot <- mse1_plot
+  }
+  # end of k is vector and n is scalar
+  # --------------------------------- #
+  
+  # if k is a scalar and n is vector #
+  if (length(n) > 1 & length(k) == 1){
+    cat("n is a vector, k is a scalar, comparison is desired\n")
+    mse0 <- mse1 <- cpu_times <- matrix(0, ncol= length(n), nrow = length(submethods))
+    colnames(mse0) <- colnames(mse1) <- colnames(cpu_times) <-paste0("n=",n)
+    rownames(mse0) <- rownames(mse1) <- rownames(cpu_times) <- submethods
+    
+    for (j in 1:length(n)){
+      tmp <- getMSE(case, n[j], k, p, rept=rept, compare=compare)
+      # full data method, first row ----
+      mse0[1,j] <- tmp$mse0_all
+      mse1[1,j] <- tmp$mse1_all
+      cpu_times[1,j] <- tmp$avg_cpu_time_simulation
+      
+      # UNI method, second row ----
+      mse0[2,j] <- tmp$mse0_srs
+      mse1[2,j] <- tmp$mse1_srs
+      cpu_times[2,j] <- tmp$avg_cpu_time_srs
+      
+      # LEVERAGE method, third row ----
+      mse0[3,j] <- tmp$mse0_lev
+      mse1[3,j] <- tmp$mse1_lev
+      cpu_times[3,j] <- tmp$avg_cpu_time_lev
+      
+      # IOBSS method, forth row ----
+      mse0[4,j] <- tmp$mse0_iboss
+      mse1[4,j] <- tmp$mse1_iboss
+      cpu_times[4,j] <- tmp$avg_cpu_time_iboss
+    }
+    
+    out <- list(mse0=mse0, mse1=mse1, cpu_time=cpu_times)
+    # reshape mse0 and mse1 for plot ----
+    mse1 <- data.frame(mses = c(log10(mse1)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(n)), logN = rep(log10(n), each=4))
+    mse0 <- data.frame(mses = c(log10(mse0)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(n)), logN = rep(log10(n),each = 4)) 
+    
+    
+    mse1_plot <- ggplot2::ggplot(data=mse1, ggplot2::aes(x=logN, y = mses, colour=factor(mse1$methods), shape=factor(mse1$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse1$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(log10(n)), max(log10(n)))) + ggplot2::xlab("log10(Full Data Size)") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'),axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=15,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Slopes")
+    
+    mse0_plot <- ggplot2::ggplot(data=mse0, ggplot2::aes(x=logN, y = mses, colour=factor(mse0$methods), shape=factor(mse0$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse0$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(log10(n)), max(log10(n)))) + ggplot2::xlab("log10(Full Data Size)") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'), axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=15,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Intercepts")
+    
+    out$mse0_plot <- mse0_plot
+    out$mse1_plot <- mse1_plot
+  }
+  # end of n is vector and k is scalar
+  # --------------------------------- #
+  # end of comparison is desired.
+  }else{
+    cat("no restrictions on n,k, comparison is not desired\n")
+  # compare is not desired: ----
+  # allows n, p to be vectors ----
+  # returns mse0, mse1, and cpu_time matrices, no plots
+    mse0 <- mse1 <- cpu_times <- matrix(0, ncol= length(k), nrow = length(n))
+    colnames(mse0) <- colnames(mse1) <- colnames(cpu_times) <- paste0("k=", k)
+    rownames(mse0) <- rownames(mse1) <- rownames(cpu_times) <- paste0("n=", n)
+      
+  for (i in 1:length(n)){
+    for(j in 1:length(k)){
+      tmp <- getMSE(case, n[i], k[j], p, rept=rept, compare=F)
+      mse0[i,j] <- tmp$mse0_iboss
+      mse1[i,j] <- tmp$mse1_iboss
+      cpu_times[i,j] <- tmp$avg_cpu_time_iboss
     }
   }
   
-    
+  out <- list(mse0=mse0, mse1=mse1, cpu_time=cpu_times, mse0_plot=NULL, mse1_plot=NULL)  
+  }  
+  
+  return(out)  
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 demoFigures <- function(figNum=NULL, p=NULL, rep=NULL){
   figs <- c("Comparisons of three subsampling methods in terms of MSEs\n with fixed subsample size 1000\n and ranging size of full data\n n=5000, 10^4, 10^5, 10^6\n",

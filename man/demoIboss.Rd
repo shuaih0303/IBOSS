@@ -2,10 +2,11 @@
 % Please edit documentation in R/demo.R
 \name{demoIboss}
 \alias{demoIboss}
-\title{Wrapper function to demonstrate examples in paper}
+\title{Customized Simulation Functions, returns MSE and plots}
 \usage{
-demoIboss()
+demoIboss(case = NULL, n = NULL, k = NULL, p = NULL, rept = NULL,
+  compare = TRUE, mse.plot = TRUE)
 }
 \description{
-Wrapper function to demonstrate examples in paper
+Customized Simulation Functions, returns MSE and plots
 }
