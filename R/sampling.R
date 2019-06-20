@@ -40,25 +40,41 @@ getIBOSS <- function(caseData, k){
 #' Function to get IBOSS sample only
 #' @param data dataframe or data.table
 #' @param k integer, desired subsample size 
+#' @param y_pos integer, position of response column
 #' @export
-getIBOSS0 <- function(data, k){
-  data_size <- dim(data)
+getIBOSS0 <- function(data, k, y_pos=0){
+  if(y_pos > 0){
+  Y <- data[, y_pos]
+  X <- data[, -y_pos]
+  }else{
+    X <- data
+  }
+  
+  data_size <- dim(X)
   N <- data_size[1]
   
   cpu_time_sample <- system.time({
     
     d <- data_size[2] 
     r <- k / d / 2
-    idx <- getIdx(data$X[,1], data$X[,1], as.integer(r), k)
+    idx <- getIdx(X[,1], X[,1], as.integer(r), k)
     for (j in 3:d) {
-      tmp <- getIdx(data$X[-idx,j], data$X[,j], as.integer(r), k)
+      tmp <- getIdx(X[-idx,j], X[,j], as.integer(r), k)
       idx <- c(idx, tmp)
     }
-    X <- data$X[idx,]
-    Y <- data$Y[idx]
+    
+    X <- X[idx,]
+    if(y_pos > 0){
+    Y <- Y[idx]
+    outdata <- data.frame(X = X, Y = Y)
+    }else{
+      outdata <- data.frame(X = X)
+    }
   })
   
-  out <- list(N = N, X = X, Y = Y,sample_size = k,
+  
+  
+  out <- list(N = N, data=outdata, sample_size = k,
               cpu_time_sample = cpu_time_sample)
   
   return(out)
