@@ -29,14 +29,21 @@ shinyServer(function(input, output) {
     withProgress(message="Initializing...", value = 0, {
       incProgress(0.1, message = "Simulation in Progress...")
     x$out$sim_output <- demoIboss(as.numeric(input$sim_case),as.numeric(strsplit(input$sim_n,split = ',')[[1]]), as.numeric(strsplit(input$sim_k,split = ',')[[1]]), as.numeric(strsplit(input$sim_p,split = ',')[[1]]), as.numeric(input$sim_rept), as.logical(input$sim_compare))
+    
       incProgress(0.7, message = "Finishing simulations...")
       incProgress(0.8, message = "Rendering output...")
     
-    output$sim_mse0 <- renderTable(x$out$sim_output$mse0)
-    output$sim_mse1 <- renderTable(x$out$sim_output$mse1)
-    output$sim_cpu_time <- renderTable(x$out$sim_output$cpu_time)
+    output$sim_mse0 <- renderTable(x$out$sim_output$mse0, rownames = T)
+    output$sim_mse1 <- renderTable(x$out$sim_output$mse1, rownames = T)
+    output$sim_cpu_time <- renderTable(x$out$sim_output$cpu_time, rownames = T)
+    
+    x$out$plot_mse <- c(length(as.numeric(strsplit(input$sim_k,split = ',')[[1]]))>1 & length(as.numeric(strsplit(input$sim_n,split = ',')[[1]]))>1 & !as.logical(input$sim_compare))
+    
+    if(x$out$plot_mse){
+      output$sim_plot_mse0 <- output$sim_plot_mse1 <- NULL
+    }else{
     output$sim_plot_mse0 <- renderPlot(plot(x$out$sim_output$mse0_plot))
-    output$sim_plot_mse1 <- renderPlot(plot(x$out$sim_output$mse1_plot))
+    output$sim_plot_mse1 <- renderPlot(plot(x$out$sim_output$mse1_plot))}
       incProgress(0.9, message = "Printing output into console...") 
       print(x$out$sim_output)
       incProgress(1, message = "Done!")

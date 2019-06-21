@@ -44,16 +44,17 @@ shinyUI(
                  mainPanel(
                    h4("Results"),
                    tabsetPanel(
-                     tabPanel("MSE Slopes", fluidRow(
-                       column(8, align="center",
-                              plotOutput("sim_plot_mse1")
+                     tabPanel("MSE Slopes", 
+                        fluidRow(column(8, align='center', tableOutput("sim_mse1"))),
+                        fluidRow(column(8, align="center", plotOutput("sim_plot_mse1")
                        )
-                     ),
-                        fluidRow(column(8, align='center', tableOutput("sim_mse1")))),
+                     )
+                        ),
                      tabPanel("MSE Intercept", 
-                              fluidRow(column(8, align='center', plotOutput("sim_plot_mse0"))),
-                              fluidRow(column(8, align='center', tableOutput("sim_mse0")))),
-                     tabPanel("Computing Time", dataTableOutput("sim_cpu_time"))
+                              fluidRow(column(8, align='center', tableOutput("sim_mse0"))),
+                              fluidRow(column(8, align='center', plotOutput("sim_plot_mse0")))
+),
+                     tabPanel("Average Computing Time", tableOutput("sim_cpu_time"))
                    )
                  )
                   

@@ -5,7 +5,7 @@
 \title{Customized Simulation Functions, returns MSE and plots}
 \usage{
 demoIboss(case = NULL, n = NULL, k = NULL, p = NULL, rept = NULL,
-  compare = TRUE, mse.plot = TRUE)
+  compare = F)
 }
 \description{
 Customized Simulation Functions, returns MSE and plots

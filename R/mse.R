@@ -17,7 +17,7 @@ getMSE <- function(case, n, k, p, rept = NULL, compare = F){
   # case number: case
   # number of predictors: dim(beta) - 1
   if (is.null(rept)) {rept = 100}
-  cat("Working on...case =", case, "n =", n, "k =",k, "p =", p, "rept =", rept, "compare=", compare, "...")
+  cat("Working on...case =", case, "n =", n, "k =",k, "p =", p, "rep =", rept, "compare=", compare, "...")
   if(compare){
   
   mse_all <- mse_iboss <- mse_srs <- mse_lev <- matrix(0, ncol=2, nrow=rept) # first col is mse0, second col is mse1
