@@ -1,12 +1,10 @@
 #' calculating Mean Squared Errors (MSE)
-#' @param caseData a list caseData has to be a list consists of 
-#' design matrix: X(intercept included)
-#' response vector: Y 
-#' true parameter: beta
-#' total number of obs(possible) : N
-#' case number: case
-#' number of predictors: dim(beta) - 1
-#' @param rept integer, time of repetitions
+#' @param case integer. Distribution to generate full data.
+#' @param n integer. Full data size.
+#' @param k integer. Subsample size.
+#' @param p integer. Number of predictors.
+#' @param rept integer. Repeat times, defualt is 100.
+#' @param compare logical. If True, output comparisons to other subsampling methods; Otherwise, output iboss sampling results only.
 #' @export
 getMSE <- function(case, n, k, p, rept = NULL, compare = F){
   # caseData has to be a list consists of 

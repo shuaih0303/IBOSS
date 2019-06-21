@@ -8,18 +8,21 @@ shinyUI(
     # self-introduction page
     tabPanel(value="intro", title = "Read Me",
              h3("Introduction to IBOSS", align = 'center'),
-             tags$hr()
+             tags$hr(),
+             verticalLayout(
+               withMathJax(),
+               h4("Information Based Optimal Subsampling (IBOSS) supports multiple linear regression models:$$y_{ij} = \\beta_0 + \\sum_{j=1}^{p} x_{ij}\\beta_j + \\epsilon_{ij}$$"),
+               tags$hr(),
+               h4("Key functions:"),
+               h5(tags$code("demoIboss"), "Built-in simulation wrappers."),
+               h5(tags$code("get_Iboss"), "Returns IBOSS algorithm and return subsamples."),
+               h5(tags$code("runIboss"), "Launch an shiny app that runs", tags$code("demoIboss"), "and",  tags$code("get_Iboss"), "."),
+               tags$hr()
+             )
+             
+             
              ),
-    
-    tabPanel(value="example", title = "Examples", h4("Examples in IBOSS paper", align = "center"), tags$hr(), 
-        selectInput("case", "Please select an example:", c("Comparisons of three subsampling methods in terms of MSEs\n with fixed subsample size 1000\n and ranging size of full data\n n=5000, 10^4, 10^5, 10^6\n",
-                                                                   "Comparisons of three subsampling methods in terms of MSEs\n with fixed size of full data 10^6\n and ranging size of subsample size\n k = 200, 400, 500, 1000, 2000, 3000, 5000\n",
-                                                                   "Comparisons of IBOSS and Full Data in terms of statistical inference\nPlots of coverage probabilities and average length of 95% confidence intervals\n against ranging size of full data\nn=5000, 10^4, 10^5, 10^6\nfixed subsample size k = 1000\n",
-                                                                   "Food Intakes Data\n",
-                                                                   "Chemical Sensor Data\n"), selected = 1), mainPanel()
-    ),
-    
-    
+
     # Simulation Page
     tabPanel(value="Simulations", title = "Simulations", 
              fluidPage(
@@ -39,6 +42,7 @@ shinyUI(
                    textInput("sim_k", "Subsample Size", value = "1000"),
                    textInput("sim_rept", "Repetition", value = "10"),
                    checkboxInput("sim_compare", "Comparisons to FULL,UNI, and LEV?", value=TRUE),
+                   helpText("If checked, Subsample Size and Full Data Size are allowed to be vectors separated by comma; otherwise, they are only allowed to be integer and vector combination."),
                    actionButton('run_sim_example', "Run Simulation!")
                  ),
                  mainPanel(
@@ -54,7 +58,8 @@ shinyUI(
                               fluidRow(column(8, align='center', tableOutput("sim_mse0"))),
                               fluidRow(column(8, align='center', plotOutput("sim_plot_mse0")))
 ),
-                     tabPanel("Average Computing Time", tableOutput("sim_cpu_time"))
+                     tabPanel("Average Sampling Time", tableOutput("sim_cpu_time"), helpText("Numbers of first row are times that generating full data.")
+                              )
                    )
                  )
                   
@@ -64,7 +69,7 @@ shinyUI(
              )
              ,
     # application page
-    tabPanel(value="app", title = "Application",
+    tabPanel(value="app", title = "Upload Data",
              fluidPage(
                
                # App title ----
@@ -84,37 +89,25 @@ shinyUI(
                                         ".csv")),
                    # Input: Checkbox if file has header ----
                    checkboxInput("header", "Dataset contains header", TRUE),
-                   
+                   fluidRow(
+                     column(4, offset = 0, radioButtons("sep", "Separator",choices = c(Comma = ",",Semicolon = ";",Tab = "\t"),selected = ",")), 
+                     column(4, offset = 0, radioButtons("quote", "Quote",choices = c(None = "","Double Quote" = '"',"Single Quote" = "'"),selected = '"')),
+                     column(4, offset = 0, radioButtons("disp", "Display",choices = c(Head = "head",All = "all"),selected = "head"))
+                     ),
                    # Horizontal line ----
                    tags$hr(),
                    
-                   numericInput(inputId="y_pos", label = "Response Column", value = 0),
+                   numericInput(inputId="y_pos", label = "Which column is response?", value = 0),
+                   helpText("0 means response is not included."),
                    numericInput(inputId="kk", label = "Subsample Size", value = 1000),
-                   # Input: Select separator ----
-                   radioButtons("sep", "Separator",
-                                choices = c(Comma = ",",
-                                            Semicolon = ";",
-                                            Tab = "\t"),
-                                selected = ","),
-                   
-                   # Input: Select quotes ----
-                   radioButtons("quote", "Quote",
-                                choices = c(None = "",
-                                            "Double Quote" = '"',
-                                            "Single Quote" = "'"),
-                                selected = '"'),
-                   
                    # Horizontal line ----
                    tags$hr(),
                    
                    # Input: Select number of rows to display ----
-                   radioButtons("disp", "Display",
-                                choices = c(Head = "head",
-                                            All = "all"),
-                                selected = "head"),
-                   actionButton(inputId = "run_iboss", "RUN",),
+
+                   actionButton(inputId = "run_iboss", "RUN IBOSS"),
                    
-                   downloadButton("download", "Download")
+                   downloadButton("download", "Download IBOSS")
                    
                  ),
                  # Main panel for displaying outputs ----
@@ -125,6 +118,7 @@ shinyUI(
                    dataTableOutput("iboss_data"),
                    verbatimTextOutput("iboss_summary"),
                    verbatimTextOutput("output")
+                   #tableOutput("iboss_data_summary_1")
                  )
                  
                )

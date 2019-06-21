@@ -1,7 +1,6 @@
 #' Function to get IBOSS sample for given dataset 
 #' 
 #'
-#' @export
 getIBOSS <- function(caseData, k){
   
   cpu_time_sample <- system.time({
@@ -81,12 +80,9 @@ getIBOSS0 <- function(data, k, y_pos=0){
 }
 
 
-#' Function to get
-
 #' Function to get leverage subsample
 #' 
 #' 
-#' @export
 getLEV <- function(caseData, k){
   
   cpu_time_sample <- system.time({

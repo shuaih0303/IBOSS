@@ -1,5 +1,5 @@
 #' Customized Simulation Functions, returns MSE and plots
-#' 
+#' @describeIn getMSE
 #' @export
 demoIboss <- function(case=NULL, n=NULL, k=NULL, p=NULL, rept=NULL, compare=F){
   if(is.null(case)){
@@ -221,7 +221,7 @@ demoFigures <- function(figNum=NULL, p=NULL, rep=NULL){
     
     plot(mse1_plot)
     plot(mse0_plot)
-    out <- list(slope_plot=mse1_plot, inter_plot=mse0_plot)
+    out <- list(slope_plot=mse1_plot, inter_plot=mse0_plot, mse0=mse0, mse1=mse1)
     rm(mse1_plot)
     rm(mse0_plot)
     }
@@ -256,7 +256,7 @@ demoFigures <- function(figNum=NULL, p=NULL, rep=NULL){
       
       plot(mse1_plot)
       plot(mse0_plot)
-      out <- list(slope_plot=mse1_plot, inter_plot=mse0_plot)
+      out <- list(slope_plot=mse1_plot, inter_plot=mse0_plot, mse0=mse0, mse1=mse1)
       rm(mse1_plot)
       rm(mse0_plot)
     }
