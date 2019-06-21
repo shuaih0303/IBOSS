@@ -7,15 +7,17 @@
 getMSE(case, n, k, p, rept = NULL, compare = F)
 }
 \arguments{
-\item{rept}{integer, time of repetitions}
+\item{case}{integer. Distribution to generate full data.}
 
-\item{caseData}{a list caseData has to be a list consists of 
-design matrix: X(intercept included)
-response vector: Y 
-true parameter: beta
-total number of obs(possible) : N
-case number: case
-number of predictors: dim(beta) - 1}
+\item{n}{integer. Full data size.}
+
+\item{k}{integer. Subsample size.}
+
+\item{p}{integer. Number of predictors.}
+
+\item{rept}{integer. Repeat times, defualt is 100.}
+
+\item{compare}{logical. If True, output comparisons to other subsampling methods; Otherwise, output iboss sampling results only.}
 }
 \description{
 calculating Mean Squared Errors (MSE)

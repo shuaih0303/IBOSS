@@ -9,6 +9,6 @@
 #' @param max integer, total subsample size, k
 #' @return vector of selected indices in full dataframe.
 getIdx <- function(x, f, rr, max) {
-    .Call(`_IBOSS_getIdx`, x, f, rr, max)
+    .Call('_IBOSS_getIdx', PACKAGE = 'IBOSS', x, f, rr, max)
 }
 

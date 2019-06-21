@@ -2,12 +2,10 @@
 % Please edit documentation in R/sampling.R
 \name{getLEV}
 \alias{getLEV}
-\title{Function to get
-Function to get leverage subsample}
+\title{Function to get leverage subsample}
 \usage{
 getLEV(caseData, k)
 }
 \description{
-Function to get
 Function to get leverage subsample
 }
