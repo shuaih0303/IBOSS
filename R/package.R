@@ -1,9 +1,4 @@
 #' IBOSS Package demonstration
-.onLoad()
-
-
-
-
 
 #' Run Demos and Simulations
 runIboss <- function(){
