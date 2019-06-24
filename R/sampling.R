@@ -1,6 +1,4 @@
 #' Function to get IBOSS sample for given dataset 
-#' 
-#'
 getIBOSS <- function(caseData, k){
   
   cpu_time_sample <- system.time({
@@ -42,7 +40,7 @@ getIBOSS <- function(caseData, k){
 #' @param y_pos integer, position of response column
 #' @export
 getIBOSS0 <- function(data, k, y_pos=0){
-  if(y_pos > 0){
+  if (y_pos > 0) {
   Y <- data[, y_pos]
   X <- data[, -y_pos]
   }else{
@@ -81,8 +79,6 @@ getIBOSS0 <- function(data, k, y_pos=0){
 
 
 #' Function to get leverage subsample
-#' 
-#' 
 getLEV <- function(caseData, k){
   
   cpu_time_sample <- system.time({
@@ -121,10 +117,6 @@ getLEV <- function(caseData, k){
 
 
 #' Function to get Simple Random Sample
-#' 
-#' 
-#' 
-#' @export
 getSRS <- function(caseData, k){
   cpu_time_sample <- system.time({
   idx <- sample(caseData$N, k, T)

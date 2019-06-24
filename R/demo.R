@@ -1,16 +1,34 @@
 #' Customized Simulation Functions, returns MSE and plots
-#' @describeIn getMSE
+#' @param case integer. Choose distribution of predictors.
+#' @param n integer. Full sample size, can be either scalar or vector.
+#' @param k integer. Subsample size, can be either scalar or vector.
+#' @param p integer. Number of predictors. 
+#' @param rept integer. Repetition times.
+#' @param compare logical. Default is TRUE. If TURE, returns table of MSEs comparing IBOSS to FULL, UNI, and LEV methods, plots will be drawn. At least one of \code{n} and \code{k} has to be integer. IF false, return IBOSS result only. No restrictions on \code{n} and \code{k}.
+#' @return A list.
+#'    \item{mse0}{MSE matrix for intercept terms}
+#'    \item{mse1}{MSE matrix for slope terms}
+#'    \item{mse0_plot}{plot of mse0, use \code{plot(mse0_plot)} to display}
+#'    \item{mse1_plot}{plot of mse1, use \code{plot(mse1_plot)} to display}
+#'    
+#'  @examples 
+#'  \dontrun{
+#'  # For normal predictor simulations
+#'  # fixed k, varing n ----
+#'  IBOSS::demoIboss(case = 1, n = c(5000, 10^4, 10^5, 10^6), k = 1000, p = 50, rept = 1000, compare = T)
+#'
+#'  # fixed n, varing k ----
+#'  IBOSS::demoIboss(case = 1, n = c(10^6), k = c(200, 400, 500, 1000, 2000, 3000, 5000), p = 50, rept = 1000, compare = T)  
+#'  }  
 #' @export
 demoIboss <- function(case=NULL, n=NULL, k=NULL, p=NULL, rept=NULL, compare=F){
-  if(is.null(case)){
+  if (is.null(case)) {
   cat("Please select an example to demonstate, or enter 0 to exit:\n")
-  cases <- c("Sample Size: 5000, 10^4, 10^5, 10^6\nDistribution: multivariate normal\nSubsample Size: \n",
-             "Sample Size: 5000, 10^4, 10^5, 10^6\nDistribution: multivariate lognormal\nSubsample Size: \n",
-             "Sample Size: 5000, 10^4, 10^5, 10^6\nDistribution: multivariate t(2)\nSubsample Size: \n",
-             "Sample Size: 5000, 10^4, 10^5, 10^6\nDistribution: mixture N(0, sigma) + t(2) + t(3) + Unif(0,2) + LN(0, sigma)\nSubsample Size: \n",
-             "Sample Size: 5000, 10^4, 10^5, 10^6\nDistribution: multivariate normal random variables with interactions and quadratic terms.\nSubsample Size: \n",
-             "Food Intake Data\n",
-             "Chemical Sensor Data\n"
+  cases <- c("Distribution: multivariate normal\nSubsample Size: \n",
+             "Distribution: multivariate lognormal\nSubsample Size: \n",
+             "Distribution: multivariate t(2)\nSubsample Size: \n",
+             "Distribution: mixture N(0, sigma) + t(2) + t(3) + Unif(0,2) + LN(0, sigma)\nSubsample Size: \n",
+             "Distribution: multivariate normal random variables with interactions and quadratic terms.\nSubsample Size: \n",
   )
   case <- menu(cases)
   }
@@ -60,9 +78,9 @@ demoIboss <- function(case=NULL, n=NULL, k=NULL, p=NULL, rept=NULL, compare=F){
   mse0 <- data.frame(mses = c(log10(mse0)), methods = rep(c("FULL", "UNI", "LEV", "D-OPT"),length(k)), logN = rep(k, each = length(k))) 
   
   
-  mse1_plot <- ggplot2::ggplot(data=mse1, ggplot2::aes(x=logN, y = mses, colour=factor(mse1$methods), shape=factor(mse1$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse1$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(k, na.rm=T), max(k, na.rm=T))) + ggplot2::xlab("Subsample Size") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'),axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Slopes")
+  mse1_plot <- ggplot2::ggplot(data=mse1, ggplot2::aes(x=logN, y = mses, colour = factor(mse1$methods), shape=factor(mse1$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse1$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(k, na.rm = T), max(k, na.rm = T))) + ggplot2::xlab("Subsample Size") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'),axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Slopes")
   
-  mse0_plot <- ggplot2::ggplot(data=mse0, ggplot2::aes(x=logN, y = mses, colour=factor(mse0$methods), shape=factor(mse0$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse0$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(k, na.rm=T), max(k, na.rm=T))) + ggplot2::xlab("Subsample Size") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'), axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Intercepts")
+  mse0_plot <- ggplot2::ggplot(data=mse0, ggplot2::aes(x=logN, y = mses, colour = factor(mse0$methods), shape=factor(mse0$methods))) + ggplot2::geom_line(ggplot2::aes(group=factor(mse0$methods))) + ggplot2::geom_point(size = 3) + ggplot2::xlim(c(min(k, na.rm=T), max(k, na.rm=T))) + ggplot2::xlab("Subsample Size") + ggplot2::ylab("log10(MSE)") + ggplot2::theme_bw() + ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = 'bottom', plot.title = ggplot2::element_text(hjust = 0.5, size = 20, face = 'bold'), axis.title.y = ggplot2::element_text(size=20,face="bold"),axis.text.x = ggplot2::element_text(size=20,face="bold"),axis.text.y = ggplot2::element_text(size=20,face="bold"),axis.title.x = ggplot2::element_text(size=20,face="bold")) + ggplot2::ggtitle("MSE of Intercepts")
   
   out$mse0_plot <- mse0_plot
   out$mse1_plot <- mse1_plot

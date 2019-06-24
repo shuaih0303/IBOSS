@@ -10,25 +10,25 @@ Generate_Case_Full_Data <- function(case, n, p, sigmax=NULL){
   cpu_time_simulation <- system.time({
     
     d <- p
-    if(is.null(sigmax))
+    if (is.null(sigmax))
     {
       
       corr  <- 0.5
       
-      sigmax <- matrix(corr, d, d) + diag(1-corr, d)
+      sigmax <- matrix(corr, d, d) + diag(1 - corr, d)
       
     }
     beta.0 = rep(1, d)
     
     switch(case,
-           {    ## 1 normal mean 0, cov=sigmax
+           {## 1 normal mean 0, cov=sigmax
              X  <- mvtnorm::rmvnorm(n, rep(0, d), sigmax)
-           }, { ## 2 lognormal mean 0, cov=sigmax
+           }, {## 2 lognormal mean 0, cov=sigmax
              X  <- mvtnorm::rmvnorm(n, rep(0, d), sigmax)
              X <- exp(X)
-           }, { ## 3 t2 mean 0, cov=sigmax
+           }, {## 3 t2 mean 0, cov=sigmax
              X  <- mnormt::rmt(n, rep(0, d), sigmax, 2)
-           }, { ## 4 mix of 5 different distributions
+           }, {## 4 mix of 5 different distributions
              X1 <- mvtnorm::rmvnorm(n/5, rep(1, d), sigmax) # normal
              X2 <- mnormt::rmt(n/5, rep(1, d), sigmax, 3) # t3
              X3 <- mnormt::rmt(n/5, rep(1, d), sigmax, 2) # t2
@@ -36,8 +36,8 @@ Generate_Case_Full_Data <- function(case, n, p, sigmax=NULL){
              X5 <- mvtnorm::rmvnorm(n/5, rep(0, d), sigmax)
              X5 <- exp(X5) # log-normal
              X <- rbind(X1, X2, X3, X4, X5)
-             rm(list=c("X1", "X2", "X3", "X4", "X5"))
-           }, { ## 17 interaction mean 0
+             rm(list = c("X1", "X2", "X3", "X4", "X5"))
+           }, {## 17 interaction mean 0
              sigmax <- sigmax[1:20, 1:20]
              X <- mvtnorm::rmvnorm(n, rep(0, 20), sigmax)
              X <- cbind(X, X[,1]*X, X[,2]*X[,11:20])
@@ -59,10 +59,10 @@ Generate_Case_Full_Data <- function(case, n, p, sigmax=NULL){
   
   mse <- rep(0, 2)
   mse[1] <- (beta.all[1] - beta0[1])^2
-  mse[2] <- sum((beta.all[-1]-beta0[-1])^2)
+  mse[2] <- sum((beta.all[-1] - beta0[-1])^2)
   
   
   names(cpu_time_simulation) <- NULL
   
-  return(list(N=n, Y = Y, X = X, beta = beta.all, betaTrue = beta0, mse=mse, cpu_time_simulation=cpu_time_simulation, cpu_time_fit=cpu_time_fit))
+  return(list(N = n, Y = Y, X = X, beta = beta.all, betaTrue = beta0, mse = mse, cpu_time_simulation=cpu_time_simulation, cpu_time_fit = cpu_time_fit))
 }
