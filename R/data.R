@@ -6,7 +6,7 @@
 #' @param p integer. Number of predictors excluding intercept.
 #' @param sigmax matrix. Covariance matrix of predicotrs, default is auto-correlated.
 Generate_Case_Full_Data <- function(case, n, p, sigmax=NULL){
-  set.seed(123)
+  #set.seed(123)
   cpu_time_simulation <- system.time({
     
     d <- p
