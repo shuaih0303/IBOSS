@@ -26,9 +26,9 @@ shinyServer(function(input, output) {
   # Simulation Page, run simulations
   
   observeEvent(input$run_sim_example,{
-    withProgress(message="Initializing...", value = 0, {
+    withProgress(message = "Initializing...", value = 0, {
       incProgress(0.1, message = "Simulation in Progress...")
-    x$out$sim_output <- demoIboss(as.numeric(input$sim_case),as.numeric(strsplit(input$sim_n,split = ',')[[1]]), as.numeric(strsplit(input$sim_k,split = ',')[[1]]), as.numeric(strsplit(input$sim_p,split = ',')[[1]]), as.numeric(input$sim_rept), as.logical(input$sim_compare))
+    x$out$sim_output <- IBOSS::demoIboss(as.numeric(input$sim_case),as.numeric(strsplit(input$sim_n,split = ',')[[1]]), as.numeric(strsplit(input$sim_k,split = ',')[[1]]), as.numeric(strsplit(input$sim_p,split = ',')[[1]]), as.numeric(input$sim_rept), as.logical(input$sim_compare))
     
       incProgress(0.7, message = "Finishing simulations...")
       incProgress(0.8, message = "Rendering output...")
