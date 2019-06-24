@@ -2,7 +2,7 @@
 
 #' Run Demos and Simulations
 runIboss <- function(){
-  runApp("inst")
+  shiny::runApp(system.file('ibossapp', package = 'IBOSS'))
 }
 
 
