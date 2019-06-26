@@ -7,6 +7,36 @@
 demoIboss(case = NULL, n = NULL, k = NULL, p = NULL, rept = NULL,
   compare = F)
 }
+\arguments{
+\item{case}{integer. Choose distribution of predictors.}
+
+\item{n}{integer. Full sample size, can be either scalar or vector.}
+
+\item{k}{integer. Subsample size, can be either scalar or vector.}
+
+\item{p}{integer. Number of predictors.}
+
+\item{rept}{integer. Repetition times.}
+
+\item{compare}{logical. Default is TRUE. If TURE, returns table of MSEs comparing IBOSS to FULL, UNI, and LEV methods, plots will be drawn. At least one of \code{n} and \code{k} has to be integer. IF false, return IBOSS result only. No restrictions on \code{n} and \code{k}.}
+}
+\value{
+A list.
+   \item{mse0}{MSE matrix for intercept terms}
+   \item{mse1}{MSE matrix for slope terms}
+   \item{mse0_plot}{plot of mse0, use \code{plot(mse0_plot)} to display}
+   \item{mse1_plot}{plot of mse1, use \code{plot(mse1_plot)} to display}
+   
+ @examples 
+ \dontrun{
+ # For normal predictor simulations
+ # fixed k, varing n ----
+ IBOSS::demoIboss(case = 1, n = c(5000, 10^4, 10^5, 10^6), k = 1000, p = 50, rept = 1000, compare = T)
+
+ # fixed n, varing k ----
+ IBOSS::demoIboss(case = 1, n = c(10^6), k = c(200, 400, 500, 1000, 2000, 3000, 5000), p = 50, rept = 1000, compare = T)  
+ }
+}
 \description{
 Customized Simulation Functions, returns MSE and plots
 }

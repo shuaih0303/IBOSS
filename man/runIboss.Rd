@@ -2,12 +2,16 @@
 % Please edit documentation in R/package.R
 \name{runIboss}
 \alias{runIboss}
-\title{IBOSS Package demonstration
-Run Demos and Simulations}
+\title{App that run Demos and Simulations}
 \usage{
 runIboss()
 }
 \description{
-IBOSS Package demonstration
-Run Demos and Simulations
+App that run Demos and Simulations
+}
+\examples{
+\dontrun{
+# to launch the app
+runIboss()
+}
 }
