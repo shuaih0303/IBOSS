@@ -3,7 +3,7 @@ library(shinythemes)
 # Define UI for application that draws a histogram
 shinyUI(
   navbarPage(
-    title = "Information Based Sub-Sampler",
+    title = "SAIF EMBA 2019 Big Data Analysis Demonstration Information Based Sub-Sampler",
     theme = shinythemes::shinytheme("cerulean"),
     # self-introduction page
     tabPanel(value="intro", title = "Read Me",
